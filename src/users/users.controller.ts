@@ -8,7 +8,7 @@ import { Roles } from '../common/decorators/roles.decorator.js';
 import { Role } from './entities/user.schemas.js';
 @Controller('users')
 @UseGuards(JwtAuthGuard)
-@Roles(Role.ADMIN)
+@Roles(Role.ADMIN && Role.HR)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
