@@ -1,5 +1,5 @@
 import { ResponseMessage } from './../common/decorators/response-message.decorator.js';
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common';
 import { DepartmentsService } from './departments.service.js';
 import { CreateDepartmentDto } from './dto/create-department.dto.js';
 import { UpdateDepartmentDto } from './dto/update-department.dto.js';
@@ -25,7 +25,10 @@ export class DepartmentsController {
   @Roles(Role.ADMIN, Role.EMPLOYEE, Role.HR)
   @Get()
   findAll(
-
+    @Query('current') currentPage: string,
+    @Query('pageLimit') limit: string,
+    @Query('qs') qs: any,
+    
   ) {
     return this.departmentsService.findAll();
   }
