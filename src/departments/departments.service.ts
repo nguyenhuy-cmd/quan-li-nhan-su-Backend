@@ -1,11 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { CreateDepartmentDto } from './dto/create-department.dto.js';
 import { UpdateDepartmentDto } from './dto/update-department.dto.js';
+import { InjectModel } from '@nestjs/mongoose';
+import { Department } from './entities/department.entity.js';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class DepartmentsService {
-  create(createDepartmentDto: CreateDepartmentDto) {
-    return 'This action adds a new department';
+  constructor(
+    @InjectModel(Department.name)
+    private readonly departmentModel: Model<Department>
+  ){}
+  async create(createDepartmentDto: CreateDepartmentDto) {
+    const newDepartment = new this.departmentModel(createDepartmentDto)
+    return await newDepartment.save()
   }
 
   findAll() {

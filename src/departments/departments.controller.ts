@@ -1,19 +1,32 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { ResponseMessage } from './../common/decorators/response-message.decorator.js';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { DepartmentsService } from './departments.service.js';
 import { CreateDepartmentDto } from './dto/create-department.dto.js';
 import { UpdateDepartmentDto } from './dto/update-department.dto.js';
+import { RolesGuard } from '../common/guards/roles.guard.js';
+import { JwtAuthGuard } from '../auth/passport/jwt-auth.guard.js';
+import { Role } from '../users/entities/user.schemas.js';
+import { Roles } from '../common/decorators/roles.decorator.js';
+
 
 @Controller('departments')
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class DepartmentsController {
   constructor(private readonly departmentsService: DepartmentsService) {}
 
+  @ResponseMessage('Tạo phòng ban thành công')
   @Post()
+  @Roles(Role.ADMIN, Role.HR)
   create(@Body() createDepartmentDto: CreateDepartmentDto) {
     return this.departmentsService.create(createDepartmentDto);
   }
 
+  @ResponseMessage('Xem tất cả ')
+  @Roles(Role.ADMIN, Role.EMPLOYEE, Role.HR)
   @Get()
-  findAll() {
+  findAll(
+
+  ) {
     return this.departmentsService.findAll();
   }
 
