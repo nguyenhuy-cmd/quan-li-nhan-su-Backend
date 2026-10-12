@@ -3,7 +3,7 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 export enum Role {
     ADMIN = 'admin',
     HR = 'hr',
-    EMPLOYEE = 'emploeer'
+    EMPLOYEE = 'employee'
 }
 @Schema({ timestamps: true })
 export class User {
