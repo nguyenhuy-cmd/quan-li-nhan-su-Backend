@@ -21,7 +21,7 @@ import { ResponseMessage } from '../common/decorators/response-message.decorator
 @Controller('employees')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class EmployeesController {
-  constructor(private readonly employeesService: EmployeesService) {}
+  constructor(private readonly employeesService: EmployeesService) { }
 
   @ResponseMessage('Tạo hồ sơ nhân viên thành công')
   @Roles(Role.ADMIN, Role.HR)
@@ -43,18 +43,18 @@ export class EmployeesController {
   @Roles(Role.ADMIN, Role.HR, Role.EMPLOYEE)
   @Get(':id')
   async findOne(@Param('id') id: number) {
-    return  this.employeesService.findOne(id);
+    return this.employeesService.findOne(id);
   }
 
   @Roles(Role.ADMIN, Role.HR)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateEmployeeDto: UpdateEmployeeDto) {
-    return this.employeesService.update(+id, updateEmployeeDto);
+  async update(@Param('id') id: string, @Body() updateEmployeeDto: UpdateEmployeeDto) {
+    return await this.employeesService.update(+id, updateEmployeeDto);
   }
 
   @Roles(Role.ADMIN)
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.employeesService.remove(+id);
+  async remove(@Param('id') id: string) {
+    return await this.employeesService.remove(+id);
   }
 }

@@ -12,7 +12,7 @@ import { Roles } from '../common/decorators/roles.decorator.js';
 @Controller('departments')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class DepartmentsController {
-  constructor(private readonly departmentsService: DepartmentsService) {}
+  constructor(private readonly departmentsService: DepartmentsService) { }
 
   @ResponseMessage('Tạo phòng ban thành công')
   @Post()
@@ -21,30 +21,29 @@ export class DepartmentsController {
     return this.departmentsService.create(createDepartmentDto);
   }
 
-  @ResponseMessage('Xem tất cả ')
+  @ResponseMessage('Xem tất cả phòng bân thành công')
   @Roles(Role.ADMIN, Role.EMPLOYEE, Role.HR)
   @Get()
   findAll(
     @Query('current') currentPage: string,
     @Query('pageLimit') limit: string,
     @Query('qs') qs: any,
-    
+
   ) {
-    return this.departmentsService.findAll();
+    return this.departmentsService.findAll(currentPage, limit, qs);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.departmentsService.findOne(+id);
-  }
-
+  @ResponseMessage('Cập nhập phòng ban thành công')
+  @Roles(Role.ADMIN)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateDepartmentDto: UpdateDepartmentDto) {
-    return this.departmentsService.update(+id, updateDepartmentDto);
+  async update(@Param('id') id: string, @Body() updateDepartmentDto: UpdateDepartmentDto) {
+    return await this.departmentsService.update(id, updateDepartmentDto)
   }
 
+  @ResponseMessage('Xóa phòng ban thành công')
+  @Roles(Role.ADMIN)
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.departmentsService.remove(+id);
+    return this.departmentsService.remove(id);
   }
 }
