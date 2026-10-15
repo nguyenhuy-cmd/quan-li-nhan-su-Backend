@@ -42,19 +42,19 @@ export class EmployeesController {
 
   @Roles(Role.ADMIN, Role.HR, Role.EMPLOYEE)
   @Get(':id')
-  async findOne(@Param('id') id: number) {
+  async findOne(@Param('id') id: string) {
     return this.employeesService.findOne(id);
   }
 
   @Roles(Role.ADMIN, Role.HR)
   @Patch(':id')
   async update(@Param('id') id: string, @Body() updateEmployeeDto: UpdateEmployeeDto) {
-    return await this.employeesService.update(+id, updateEmployeeDto);
+    return await this.employeesService.update(id, updateEmployeeDto);
   }
 
   @Roles(Role.ADMIN)
   @Delete(':id')
   async remove(@Param('id') id: string) {
-    return await this.employeesService.remove(+id);
+    return await this.employeesService.remove(id);
   }
 }

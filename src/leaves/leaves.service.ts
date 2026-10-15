@@ -24,17 +24,14 @@ export class LeavesService {
     const skip = (page - 1) * defaultLimit;
 
     const whereCondition: any = {};
-    if (qs?.fullName) {
-      whereCondition.fullName = { $regex: qs.fullName, $options: 'i' }
+    if (qs?.employeeId) {
+      whereCondition.employeeId = qs.employeeId
     }
-    if (qs?.code) {
-      whereCondition.code = { $regex: qs.code, $options: 'i' }
+    if (qs?.type) {
+      whereCondition.type = { $regex: qs.type, $options: 'i' }
     }
-    if (qs?.email) {
-      whereCondition.email = { $regex: qs.email, $options: 'i' }
-    }
-    if (qs?.phone) {
-      whereCondition.phone = { $regex: qs.code, $options: 'i' }
+    if (qs?.status) {
+      whereCondition.status = qs.status
     }
 
     const totalItem = await this.leavesModel.countDocuments(whereCondition)
@@ -52,11 +49,12 @@ export class LeavesService {
         pageSize: defaultLimit,
         pages: totalPage,
         total: totalItem
-      }
+      },
+      result
     }
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     const leaver = await this.leavesModel.findById(id);
     if (!leaver) {
       throw new NotFoundException('Không tìm thấy đơn xin nghỉ này')
@@ -67,7 +65,7 @@ export class LeavesService {
     }
   }
 
-  async update(id: number, approveLeaveDto: ApproveLeaveDto) {
+  async update(id: string, approveLeaveDto: ApproveLeaveDto) {
     const { status, reviewedBy, reason } = approveLeaveDto;
 
     // Tìm đơn nghỉ phép theo id

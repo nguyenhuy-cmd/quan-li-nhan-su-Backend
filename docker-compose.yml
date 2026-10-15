@@ -1,0 +1,36 @@
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - app_network
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: hr-backend
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - DB_URI=mongodb://mongodb:27017/quan-li-nhan-su
+      - JWT_SECRET=super_secret_jwt_key_hr_management_2026
+      - JWT_EXPIRATION=1d
+    depends_on:
+      - mongodb
+    networks:
+      - app_network
+
+volumes:
+  mongo_data:
+
+networks:
+  app_network:
+    driver: bridge

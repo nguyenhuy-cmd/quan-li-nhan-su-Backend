@@ -16,14 +16,14 @@ export class AttendancesController {
 
   @Roles(Role.ADMIN, Role.EMPLOYEE, Role.HR)
   @ResponseMessage('Đã check in thành công')
-  @Post()
+  @Post('check-in')
   checkIn(@Body() checkInDto: CheckInDto) {
     return this.attendancesService.checkIn(checkInDto);
   }
 
   @Roles(Role.ADMIN, Role.EMPLOYEE, Role.HR)
   @ResponseMessage('Đã chack out thành công')
-  @Post()
+  @Post('check-out')
   checkOut(@Body() checkOutDto: CheckOutDto) {
     return this.attendancesService.checkOut(checkOutDto);
   }
@@ -32,6 +32,6 @@ export class AttendancesController {
   @ResponseMessage('Xem chi tiết chấm lương')
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.attendancesService.findOne(+id);
+    return this.attendancesService.findOne(id);
   }
 }

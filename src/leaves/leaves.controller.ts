@@ -34,7 +34,7 @@ export class LeavesController {
   @ResponseMessage('Lấy chi tiết đơn xin nghỉ thành công')
   @Get(':id')
   async findOne(@Param('id') id: string) {
-    return await this.leavesService.findOne(+id);
+    return await this.leavesService.findOne(id);
   }
 
   @Roles(Role.ADMIN)
@@ -43,7 +43,7 @@ export class LeavesController {
   async update(
     @Param('id') id: string,
     @Body() approveLeaveDto: ApproveLeaveDto) {
-    return await this.leavesService.update(+id, approveLeaveDto);
+    return await this.leavesService.update(id, approveLeaveDto);
   }
 
 

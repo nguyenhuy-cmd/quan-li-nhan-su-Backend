@@ -80,7 +80,7 @@ export class AttendancesService {
     return await exAttendance.save()
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     const exAttendance = await this.attendanceModel.findById(id);
     if (!exAttendance) {
       throw new NotFoundException('Không tìm thấy thông tin chấm lương của nhân viên này')

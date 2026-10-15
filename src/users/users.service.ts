@@ -11,7 +11,7 @@ export class UsersService {
   constructor(
     @InjectModel(User.name)
     private readonly userModel: Model<User>
-  ){}
+  ) { }
   // Số vòng lặp mã hóa (Salt Rounds) - Mặc định 10 là chuẩn và an toàn
   private readonly SALT_ROUNDS = 10;
   // 1. Hàm băm mật khẩu
@@ -25,9 +25,12 @@ export class UsersService {
   }
 
   async create(createUserDto: CreateUserDto) {
-    const hashPassword = this.hashPassword(createUserDto.password)
+    const hashPassword = await this.hashPassword(createUserDto.password)
 
-    const newUser = new this.userModel(createUserDto);
+    const newUser = new this.userModel({
+      ...createUserDto,
+      password: hashPassword
+    });
     return await newUser.save()
   }
 
@@ -39,44 +42,44 @@ export class UsersService {
 
     // Tìm kiếm theo username và email
     const whereCondition: any = {};
-    if(qs?.username){
-      whereCondition.username = {$regex: qs.username, $options: 'i'}
+    if (qs?.username) {
+      whereCondition.username = { $regex: qs.username, $options: 'i' }
     }
-    if(qs?.email){
-      whereCondition.email = {$regex: qs.email, $options: 'i'}
+    if (qs?.email) {
+      whereCondition.email = { $regex: qs.email, $options: 'i' }
     }
 
     // Lấy dữ liệu và đêmns tổng số bản ghi
-    const totalItem =  await this.userModel.countDocuments(whereCondition)
-    const result = await  this.userModel.find(whereCondition)
-    .skip(skip)
-    .limit(defaultLimit)
-    .sort({_id: -1})
-    .lean()
+    const totalItem = await this.userModel.countDocuments(whereCondition)
+    const result = await this.userModel.find(whereCondition)
+      .skip(skip)
+      .limit(defaultLimit)
+      .sort({ _id: -1 })
+      .lean()
 
     // Tính tổng số trang
-    const totalPage = Math.ceil(totalItem/ defaultLimit)
+    const totalPage = Math.ceil(totalItem / defaultLimit)
 
     // Xóa  trường password trước khi trả về frontend
     const safeResult = result.map(user => {
-      const {password, ...result} = user;
+      const { password, ...result } = user;
       return result
-   })
+    })
 
-   return {
-    meta: {
-      current: page,
-      pageSize: defaultLimit,
-      pages: totalPage,
-      total: totalItem
-    },
-    result: safeResult 
-   }
+    return {
+      meta: {
+        current: page,
+        pageSize: defaultLimit,
+        pages: totalPage,
+        total: totalItem
+      },
+      result: safeResult
+    }
   }
 
   async findOne(id: string) {
     const exUser = await this.userModel.findById(id)
-    if(!exUser){
+    if (!exUser) {
       throw new NotFoundException('Không tìm thấy user')
     }
     return {
@@ -87,19 +90,19 @@ export class UsersService {
 
   async update(id: string, updateUserDto: UpdateUserDto) {
     const updateUser = await this.userModel.findByIdAndUpdate(id, updateUserDto)
-    if(!updateUser){
+    if (!updateUser) {
       throw new NotFoundException('Không tìm thấy user')
     }
     return {
       message: 'Đã cập nhập thành công',
-      id: id, 
+      id: id,
       updateUser
     }
   }
 
   async remove(id: string) {
     const deleteUser = await this.userModel.findByIdAndDelete(id)
-    if(!deleteUser){
+    if (!deleteUser) {
       throw new NotFoundException('Không tìm thấy user')
     }
     return {
@@ -110,16 +113,16 @@ export class UsersService {
   }
 
   // Tìm user theo email
-  async findByEmail(email: string){
-    return await this.userModel.findOne({email})
+  async findByEmail(email: string) {
+    return await this.userModel.findOne({ email })
   }
 
   // Nick admin
-  async createAdmin(){
+  async createAdmin() {
     const admin = 'admin@gmail.com';
-    const exAdmin = await this.userModel.findOne({email: admin})
+    const exAdmin = await this.userModel.findOne({ email: admin })
 
-    if(!exAdmin){
+    if (!exAdmin) {
       const hashPassword = await bcrypt.hash('123456', 10)
       await this.userModel.create({
         username: 'admin',
@@ -128,8 +131,8 @@ export class UsersService {
         role: Role.ADMIN
       });
       console.log("ĐÃ lập Admin thành công");
-      
+
     }
-    
+
   }
 }

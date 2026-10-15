@@ -24,11 +24,11 @@ export class SalariesService {
 
     // Tìm kiếm theo username và email
     const whereCondition: any = {};
-    if (qs?.username) {
-      whereCondition.username = { $regex: qs.username, $options: 'i' }
+    if (qs?.employeeId) {
+      whereCondition.employeeId = { $regex: qs.employeeId, $options: 'i' }
     }
-    if (qs?.email) {
-      whereCondition.email = { $regex: qs.email, $options: 'i' }
+    if (qs?.status) {
+      whereCondition.status = { $regex: qs.status, $options: 'i' }
     }
 
     // Lấy dữ liệu và đêmns tổng số bản ghi
@@ -48,7 +48,8 @@ export class SalariesService {
         pageSize: defaultLimit,
         pages: totalPage,
         total: totalItem
-      }
+      },
+      result
     }
   }
 

@@ -37,7 +37,7 @@ export class EmployeesService {
       whereCondition.email = { $regex: qs.email, $options: 'i' }
     }
     if (qs?.phone) {
-      whereCondition.phone = { $regex: qs.code, $options: 'i' }
+      whereCondition.phone = { $regex: qs.phone, $options: 'i' }
     }
 
     const totalItem = await this.employeeModel.countDocuments(whereCondition)
@@ -55,11 +55,12 @@ export class EmployeesService {
         pageSize: defaultLimit,
         pages: totalPage,
         total: totalItem
-      }
+      },
+      result
     }
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     const exEmployees = await this.employeeModel.findById(id)
     if (!exEmployees) {
       throw new NotFoundException('không tìm đc nhân viên')
@@ -70,7 +71,7 @@ export class EmployeesService {
     }
   }
 
-  async update(id: number, updateEmployeeDto: UpdateEmployeeDto) {
+  async update(id: string, updateEmployeeDto: UpdateEmployeeDto) {
     const updateEmployees = await this.employeeModel.findByIdAndUpdate(id, updateEmployeeDto)
     if (!updateEmployees) {
       throw new NotFoundException('Không tìm thấy nhân viên')
@@ -82,7 +83,7 @@ export class EmployeesService {
     }
   }
 
-  async remove(id: number) {
+  async remove(id: string) {
     const deleteEmployees = await this.employeeModel.findByIdAndDelete(id)
     if (!deleteEmployees) {
       throw new NotFoundException('Không tìm thấy nhân viên')

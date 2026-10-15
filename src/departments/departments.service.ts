@@ -24,11 +24,11 @@ export class DepartmentsService {
 
     // Tìm kiếm theo username và email
     const whereCondition: any = {};
-    if (qs?.username) {
-      whereCondition.username = { $regex: qs.username, $options: 'i' }
+    if (qs?.name) {
+      whereCondition.name = { $regex: qs.name, $options: 'i' }
     }
-    if (qs?.email) {
-      whereCondition.email = { $regex: qs.email, $options: 'i' }
+    if (qs?.code) {
+      whereCondition.code = { $regex: qs.code, $options: 'i' }
     }
 
     // Lấy dữ liệu và đêmns tổng số bản ghi
@@ -48,7 +48,8 @@ export class DepartmentsService {
         pageSize: defaultLimit,
         pages: totalPage,
         total: totalItem
-      }
+      },
+      result
     }
   }
 

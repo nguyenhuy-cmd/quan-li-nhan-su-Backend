@@ -23,6 +23,6 @@ export class PerformancesController {
   @Roles(Role.ADMIN, Role.HR, Role.EMPLOYEE)
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.performancesService.findOne(+id);
+    return this.performancesService.findOne(id);
   }
 }

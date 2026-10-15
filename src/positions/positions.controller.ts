@@ -12,7 +12,7 @@ import { ResponseMessage } from '../common/decorators/response-message.decorator
 @Controller('positions')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class PositionsController {
-  constructor(private readonly positionsService: PositionsService) {}
+  constructor(private readonly positionsService: PositionsService) { }
 
   @ResponseMessage('Tạo quản lí chức danh thành công')
   @Post()
@@ -25,10 +25,10 @@ export class PositionsController {
   @Roles(Role.ADMIN, Role.HR, Role.EMPLOYEE)
   @Get()
   findAll(
-    @Query('current') currentPage: string, 
+    @Query('current') currentPage: string,
     @Query('pageLimit') limit: string,
     @Query('qs') qs: any
-    
+
   ) {
     return this.positionsService.findAll(currentPage, limit, qs);
   }
@@ -37,14 +37,14 @@ export class PositionsController {
   @ResponseMessage('Cập nhật chức danh thành công')
   @Roles(Role.ADMIN)
   @Patch(':id')
-  update(@Param('id') id: number, @Body() updatePositionDto: UpdatePositionDto) {
-    return this.positionsService.update(+id, updatePositionDto);
+  update(@Param('id') id: string, @Body() updatePositionDto: UpdatePositionDto) {
+    return this.positionsService.update(id, updatePositionDto);
   }
 
   @ResponseMessage('Xóa chức danh thành công')
   @Roles(Role.ADMIN)
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.positionsService.remove(+id);
+    return this.positionsService.remove(id);
   }
 }
