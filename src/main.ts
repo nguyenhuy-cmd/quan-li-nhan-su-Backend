@@ -8,6 +8,9 @@ async function bootstrap() {
     instrument: ObserveInstrument,
   });
 
+  // Tấm thẻ thông hành cho phép Backend đón nhận các yêu cầu (request) gửi tới từ Frontend.
+  app.enableCors();
+
   app.useGlobalPipes(new ValidationPipe({
     whitelist: true, // Tự động loại bỏ các field không khai báo trong DTO
   }));
