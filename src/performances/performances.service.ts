@@ -1,26 +1,28 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreatePerformanceDto } from './dto/create-performance.dto.js';
 import { UpdatePerformanceDto } from './dto/update-performance.dto.js';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class PerformancesService {
-  create(createPerformanceDto: CreatePerformanceDto) {
-    return 'This action adds a new performance';
+  constructor(
+    @InjectModel(Performance.name)
+    private readonly performanceModel: Model<Performance>
+  ) { }
+  async create(createPerformanceDto: CreatePerformanceDto) {
+    const newDanhGia = new this.performanceModel(createPerformanceDto)
+    return await newDanhGia.save()
   }
 
-  findAll() {
-    return `This action returns all performances`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} performance`;
-  }
-
-  update(id: number, updatePerformanceDto: UpdatePerformanceDto) {
-    return `This action updates a #${id} performance`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} performance`;
+  async findOne(id: number) {
+    const xemDanhGia = await this.performanceModel.findById(id)
+    if (!xemDanhGia) {
+      throw new NotFoundException(`Hiện tại không có đánh giá nào`)
+    }
+    return {
+      id: id,
+      xemDanhGia
+    }
   }
 }

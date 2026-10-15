@@ -1,34 +1,37 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { AttendancesService } from './attendances.service.js';
 import { CreateAttendanceDto } from './dto/create-attendance.dto.js';
 import { UpdateAttendanceDto } from './dto/update-attendance.dto.js';
+import { CheckInDto } from './dto/check-in.dto.js';
+import { CheckOutDto } from './dto/check-out.dto.js';
+import { JwtAuthGuard } from '../auth/passport/jwt-auth.guard.js';
+import { ResponseMessage } from '../common/decorators/response-message.decorator.js';
+import { Roles } from '../common/decorators/roles.decorator.js';
+import { Role } from '../users/entities/user.schemas.js';
 
 @Controller('attendances')
+@UseGuards(JwtAuthGuard)
 export class AttendancesController {
-  constructor(private readonly attendancesService: AttendancesService) {}
+  constructor(private readonly attendancesService: AttendancesService) { }
 
+  @Roles(Role.ADMIN, Role.EMPLOYEE, Role.HR)
+  @ResponseMessage('Đã check in thành công')
   @Post()
-  create(@Body() createAttendanceDto: CreateAttendanceDto) {
-    return this.attendancesService.create(createAttendanceDto);
+  checkIn(@Body() checkInDto: CheckInDto) {
+    return this.attendancesService.checkIn(checkInDto);
   }
 
-  @Get()
-  findAll() {
-    return this.attendancesService.findAll();
+  @Roles(Role.ADMIN, Role.EMPLOYEE, Role.HR)
+  @ResponseMessage('Đã chack out thành công')
+  @Post()
+  checkOut(@Body() checkOutDto: CheckOutDto) {
+    return this.attendancesService.checkOut(checkOutDto);
   }
 
+  @Roles(Role.ADMIN, Role.EMPLOYEE, Role.HR)
+  @ResponseMessage('Xem chi tiết chấm lương')
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.attendancesService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAttendanceDto: UpdateAttendanceDto) {
-    return this.attendancesService.update(+id, updateAttendanceDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.attendancesService.remove(+id);
   }
 }

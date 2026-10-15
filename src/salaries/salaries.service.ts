@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateSalaryDto } from './dto/create-salary.dto.js';
 import { UpdateSalaryDto } from './dto/update-salary.dto.js';
 import { InjectModel } from '@nestjs/mongoose';
@@ -53,9 +53,17 @@ export class SalariesService {
   }
 
 
-  async update(id: number, updateSalaryDto: UpdateSalaryDto) {
-    const upddateSalary = await this.salaryModel.findOneAndUpdate(id, updateSalaryDto)
+  async update(id: string, updateSalaryDto: UpdateSalaryDto) {
+    const updateSalary = await this.salaryModel.findByIdAndUpdate(
+      id,
+      updateSalaryDto,
+      { new: true } // Trả về dữ liệu mới sau khi đã cập nhật
+    );
+
+    if (!updateSalary) {
+      throw new NotFoundException('Không tìm thấy mức lương');
+    }
+
+    return updateSalary;
   }
-
-
 }

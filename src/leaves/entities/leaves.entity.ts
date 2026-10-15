@@ -1,10 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Schema as MongooseSchema } from 'mongoose';
 
-export type LeafDocument = HydratedDocument<Leaf>;
+export type LeaveDocument = HydratedDocument<Leave>;
 
 @Schema({ timestamps: true })
-export class Leaf {
+export class Leave {
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Employee', required: true })
   employeeId: MongooseSchema.Types.ObjectId;
 
@@ -27,6 +27,6 @@ export class Leaf {
   reviewedBy: MongooseSchema.Types.ObjectId;
 }
 
-export const LeafSchema = SchemaFactory.createForClass(Leaf);
+export const LeavesSchema = SchemaFactory.createForClass(Leave);
 
-LeafSchema.index({ employeeId: 1, startDate: -1 });
+LeavesSchema.index({ employeeId: 1, startDate: -1 });

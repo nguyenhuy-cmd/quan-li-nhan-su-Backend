@@ -33,7 +33,7 @@ export class SalariesController {
 
 
   @Patch(':id')
-  update(@Param('id') id: number, @Body() updateSalaryDto: UpdateSalaryDto) {
+  update(@Param('id') id: string, @Body() updateSalaryDto: UpdateSalaryDto) {
     return this.salariesService.update(id, updateSalaryDto);
   }
 

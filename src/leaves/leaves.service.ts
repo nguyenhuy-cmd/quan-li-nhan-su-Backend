@@ -1,26 +1,98 @@
-import { Injectable } from '@nestjs/common';
-import { CreateLeafDto } from './dto/create-leaf.dto.js';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { CreateLeaveDto } from './dto/create-leave.dto.js';
 import { UpdateLeafDto } from './dto/update-leaf.dto.js';
+import { InjectModel } from '@nestjs/mongoose';
+import { Leave } from './entities/leaves.entity.js';
+import { Model } from 'mongoose';
+import { ApproveLeaveDto } from './dto/approve-leave.dto.js';
 
 @Injectable()
 export class LeavesService {
-  create(createLeafDto: CreateLeafDto) {
-    return 'This action adds a new leaf';
+  constructor(
+    @InjectModel(Leave.name)
+    private readonly leavesModel: Model<Leave>,
+  ) { }
+  async create(createLeaveDto: CreateLeaveDto) {
+    const newLeave = new this.leavesModel(createLeaveDto)
+    return await newLeave.save()
   }
 
-  findAll() {
-    return `This action returns all leaves`;
+  async findAll(currentPage: string, limit: string, qs: any) {
+    const page = parseInt(currentPage) || 1;
+    const defaultLimit = parseInt(limit) || 10;
+
+    const skip = (page - 1) * defaultLimit;
+
+    const whereCondition: any = {};
+    if (qs?.fullName) {
+      whereCondition.fullName = { $regex: qs.fullName, $options: 'i' }
+    }
+    if (qs?.code) {
+      whereCondition.code = { $regex: qs.code, $options: 'i' }
+    }
+    if (qs?.email) {
+      whereCondition.email = { $regex: qs.email, $options: 'i' }
+    }
+    if (qs?.phone) {
+      whereCondition.phone = { $regex: qs.code, $options: 'i' }
+    }
+
+    const totalItem = await this.leavesModel.countDocuments(whereCondition)
+    const result = await this.leavesModel.find(whereCondition)
+      .skip(skip)
+      .limit(defaultLimit)
+      .sort({ _id: -1 })
+      .lean()
+
+    const totalPage = Math.ceil(totalItem / defaultLimit)
+
+    return {
+      meta: {
+        current: page,
+        pageSize: defaultLimit,
+        pages: totalPage,
+        total: totalItem
+      }
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} leaf`;
+  async findOne(id: number) {
+    const leaver = await this.leavesModel.findById(id);
+    if (!leaver) {
+      throw new NotFoundException('Không tìm thấy đơn xin nghỉ này')
+    }
+    return {
+      id: id,
+      leaver
+    }
   }
 
-  update(id: number, updateLeafDto: UpdateLeafDto) {
-    return `This action updates a #${id} leaf`;
+  async update(id: number, approveLeaveDto: ApproveLeaveDto) {
+    const { status, reviewedBy, reason } = approveLeaveDto;
+
+    // Tìm đơn nghỉ phép theo id
+    const leaveRequest = await this.leavesModel.findById(id)
+    if (!leaveRequest) {
+      throw new NotFoundException('Không tìm thấy đơn xin nghỉ');
+    }
+
+    // Kiểm tra: nếu đơn hàng đc xử lý trước đó:
+    if (leaveRequest.status !== 'pending') {
+      throw new BadRequestException(
+        `Đơn hàng đã được xử lý trước đó: ${leaveRequest.status}`
+      );
+    }
+
+    // Cập nhập thông tin
+    leaveRequest.status = status;
+    leaveRequest.reviewedBy = reviewedBy as any;
+
+    if (reason) {
+      leaveRequest.reason = leaveRequest.reason
+        ? `${leaveRequest.reason} | Ghi chú người duyệt ${reason}`
+        : `Ghi chú người duyệt ${reason}`
+    }
+    return await leaveRequest.save();
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} leaf`;
-  }
 }
