@@ -1,6 +1,9 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { createObserveModule } from '@nestjs/observe';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
 import { UsersModule } from './users/users.module.js';
@@ -14,11 +17,16 @@ import { AttendancesModule } from './attendances/attendances.module.js';
 import { LeavesModule } from './leaves/leaves.module.js';
 import { PerformancesModule } from './performances/performances.module.js';
 
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
 
 @Module({
   imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'public'),
+      exclude: ['/api/(.*)'],
+    }),
     ConfigModule.forRoot({ isGlobal: true }),
     MongooseModule.forRootAsync({
       inject: [ConfigService],
